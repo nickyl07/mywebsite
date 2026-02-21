@@ -1,24 +1,31 @@
 name: Deploy Astro to GitHub Pages
 
+# 明确指定触发条件
 on:
   push:
-    branches: [ main ]  # 监听 main 分支的推送
+    branches:
+      - main  # 只在 main 分支推送时触发
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取完整历史，避免部署时出现问题
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20  # 用兼容 Astro 的 Node 版本
-          cache: 'pnpm'     # 适配你的 pnpm 包管理器
+          node-version: 20  # 使用 Astro 兼容的 Node 20 版本
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm  # 确保在 GitHub 环境中安装 pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --force  # 使用 --force 解决依赖冲突
 
       - name: Build Astro site
         run: pnpm run build
@@ -28,3 +35,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist  # Astro 构建输出目录
+          publish_branch: gh-pages  # 明确指定部署到 gh-pages 分支
