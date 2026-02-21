@@ -137,7 +137,7 @@ Dept.pif N
 
 其中 `Dept.pif` 是重命名后的 AutoIt3 解释器（白名单程序），而 `N`（或 `N.a3x`）是刚刚拼接好的恶意脚本。利用 AutoIt 执行恶意代码可以有效绕过部分基于特征码的查杀。
 
-![image-20260124225700727](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252795.png)
+![image-20260124225700727](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221225948036.png)
 
 ### 4. 最终意图：Lumma 引导 SectopRAT
 
@@ -148,7 +148,7 @@ Dept.pif N
 
 ![Screenshot of a Wireshark application displaying network traffic data filtered to show interaction from a RAT (Remote Access Trojan) installer, with columns for timestamp, handshake type, host names, and other data, highlighting malicious activities. Text indicates the Lumma Stealer C2 traffic, the request for SECTOP RAT installer and the SECTOP RAT C2 traffic. ](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221730399.png)
 
-![Screenshot of a Windows computer screen showing the process of creating a persistent SECTOP RAT on an infected host, with files named AutoIt3.exe being highlighted and details displayed in various open windows.](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252797.jpeg)
+![Screenshot of a Windows computer screen showing the process of creating a persistent SECTOP RAT on an infected host, with files named AutoIt3.exe being highlighted and details displayed in various open windows.](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221225909641.jpeg)
 
 ## 总结与防御
 
