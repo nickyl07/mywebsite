@@ -14,10 +14,17 @@ import Footer from '~/components/base/Footer.astro'
 import ToTopButton from '~/components/widgets/ToTopButton.astro'
 import Backdrop from '~/components/base/Backdrop.astro'
 
+import MusicPlayer from '~/components/MusicPlayer.vue'
+import { ClientRouter } from 'astro:transitions';
+
 import { SITE, UI, FEATURES } from '~/config'
 import { withBasePath } from '~/utils/path'
 
 import type { BgType } from '~/types'
+
+import fs from 'node:fs'
+import path from 'node:path'
+
 
 interface Props {
   title?: string
@@ -26,6 +33,22 @@ interface Props {
   bgType?: BgType | false
   pubDate?: string
   lastModDate?: string
+}
+
+const mediaDir = path.join(process.cwd(), 'public/media')
+let autoSongs = []
+
+try {
+  if (fs.existsSync(mediaDir)) {
+    autoSongs = fs.readdirSync(mediaDir)
+      .filter(file => file.endsWith('.mp3'))
+      .map(file => ({
+        name: file.replace('.mp3', ''), // 去掉后缀作为歌名
+        url: withBasePath(`/media/${file}`) // 生成正确的 URL [cite: 5]
+      }))
+  }
+} catch (e) {
+  console.error('读取媒体文件夹失败:', e)
 }
 
 const { title, description, ogImage, bgType, pubDate, lastModDate } =
@@ -49,6 +72,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
 <!doctype html>
 <html lang={SITE.lang}>
   <head>
+    <ClientRouter />
     <Head {title} {description} {ogImage} {pubDate} {lastModDate} />
   </head>
 
@@ -57,10 +81,15 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
       font-sans text-gray-700 dark:text-gray-200"
     style={Object.keys(style).length !== 0 ? style : undefined}
     data-no-sliding={enableSlideEnterAnim ? undefined : ''}
+    data-astro-transition-persist="music-player"
   >
     <!-- Background -->
     {bgType && <Background type={bgType} />}
-
+    <MusicPlayer 
+     client:only="vue" 
+     songs={autoSongs} 
+     transition:persist="global-music-player" 
+   />
     <!-- Skip Link -->
     <Link
       href="#main"
@@ -86,13 +115,15 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
           </footer>
         )
       }
+
       <!-- Comments -->
       <slot name="giscus" />
     </main>
-
     <!-- Footer -->
     <Footer />
     <ToTopButton />
+
+ 
 
     <!-- Panel Backdrop (on mobile) -->
     <Backdrop />
@@ -111,3 +142,6 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     </script>
   </body>
 </html>
+
+
+
