@@ -1,7 +1,7 @@
 ---
 title: WannaCry勒索病毒深度解构
 description: '' 
-pubDate: 2024-06-15
+pubDate: 2025-06-15
 lastModDate: ''
 ogImage: true
 toc: true
@@ -15,7 +15,7 @@ search: true
 
 SHA1: 5ff465afaabcbf0150d1a3ab2c2e74f3a4426467
 
-![image-20240814171222677](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151444.png)
+![image-20240814171222677](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222105638.png)
 
 **勒索病毒与传统恶意软件的行为差异对比**
 
@@ -26,7 +26,7 @@ SHA1: 5ff465afaabcbf0150d1a3ab2c2e74f3a4426467
 | **对数据的操作** | 读取、回传             | 删除、覆写 (不可逆)    | **加密 (理论可逆，需私钥)**                  |
 | **系统稳定性**   | 极力维护系统正常运行   | 不在乎系统是否崩溃     | **刻意避开系统文件，确保OS能运行以支付赎金** |
 
-## 第一阶段：Payload 释放与环境初始化（Dropper） 
+## 第一阶段：Payload 释放与环境初始化
 
 WannaCry 并非单兵作战，它携带了一个庞大的“军火库”。在样本运行初期，它的首要任务不是加密，而是将这些工具释放出来，表现为典型的 Dropper 行为。
 
@@ -34,15 +34,15 @@ WannaCry 并非单兵作战，它携带了一个庞大的“军火库”。在�
 
 样本通过硬编码密码 `WNcry@2ol7` 解密自身的资源段，并释放以下关键组件至运行目录。
 
-![image-20240814174017725](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151446.png)
+![image-20240814174017725](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222109086.png)
 
 解压资源文件 释放资源 解压密码为 Str='WNcry@2ol7'
 
-![image-20240911155645377](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151460.png)
+![image-20240911155645377](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222118553.png)
 
 解压后，我们在系统目录中会看到以下关键组件，它们分工明确：
 
-![image-20240816170327025](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151449.png)
+![image-20240816170327025](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222120845.png)
 
 - **核心加载器 (`tasksche.exe`)**：负责维持病毒运行状态。
 - **加密引擎 (`t.wnry`)**：核心 Payload，以 DLL 形式存在，负责文件遍历与加密操作。
@@ -55,11 +55,11 @@ WannaCry 并非单兵作战，它携带了一个庞大的“军火库”。在�
 
   *互斥体检查在t.wnry解密后。
 
-  ![image-20240918144017432](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162240958.png)
+  ![image-20240918144017432](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222124140.png)
 
 - **环境隐蔽**：通过 `attrib +h` 将工作目录设为隐藏，并使用 `icacls . /grant Everyone:F` 授予全员读写权限，确保加密模块在遍历文件时不会因权限问题被中断。
 
-  ![image-20240819105247980](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241751.png)
+  ![image-20240819105247980](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222125959.png)
 
 ### 3. 匿名通信网络的建立
 
@@ -69,21 +69,21 @@ WannaCry 并非单兵作战，它携带了一个庞大的“军火库”。在�
 
   c.wnry内容：服务器链接和Tor下载链接
 
-  ![image-20240909162233256](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151461.png)
+  ![image-20240909162233256](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222129378.png)
 
   s.wnry内容：压缩文件，打包的是Tor相关组件
 
-  ![image-20240909170252831](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151462.png)
+  ![image-20240909170252831](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222131435.png)
 
   在三个比特币交易地址中随机选择一个，写入c.wnry
 
-  ![image-20240904152306306](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151463.png)
+  ![image-20240904152306306](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222245123.png)
 
 ## 第二阶段：高价值资产甄别
 
 这是勒索病毒区别于其他破坏性病毒最显著的特征之一。 它的目标不是为了破坏操作系统，而是为了“绑架”用户数据。因此，它内置了一套精密的文件过滤机制。
 
-![image-20240919154433777](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241331.png)
+![image-20240919154433777](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222242338.png)
 
 ### 1. 避让关键系统目录
 
@@ -129,25 +129,25 @@ WannaCry 并非单兵作战，它携带了一个庞大的“军火库”。在�
 
 首先，t.wnry是加密文件，所以需要解密后再做分析。
 
-![image-20240909174105447](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151468.png)
+![image-20240909174105447](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222237413.png)
 
 在样本母体中存在对t.wnry文件解密的函数。
 
-![image-20260115163509343](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241332.png)
+![image-20260115163509343](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222235713.png)
 
 提取t.wnry文件，只需在病毒母体运行解密函数后，将文件从中剥离出来。
 
 运行解密函数后，跳出做比较的位置，在这里可以直接看到完整的文件头。在EAX处右键—>在内存窗口转到 就到达程序入口。
 
-![image-20240916170533363](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151470.png)
+![image-20240916170533363](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222233455.png)
 
 t.wnry的大小
 
-![image-20240916173122197](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151471.png)
+![image-20240916173122197](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222230676.png)
 
 dump
 
-![image-20240916173202210](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151472.png)
+![image-20240916173202210](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222228589.png)
 
 这样就直接剥离出来啦
 
@@ -155,9 +155,9 @@ dump
 
 ### TaskStart
 
-![image-20240918143423002](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151473.png)
+![image-20240918143423002](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222223893.png)
 
-![image-20240918143509833](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151474.png)
+![image-20240918143509833](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222221678.png)
 
 ### 2. 密钥生成与管理架构
 
@@ -172,7 +172,7 @@ WannaCry 使用了 **AES + RSA** 的混合加密方式，这也是现代勒索�
 
 ❶ 生成随机的 AES 密钥（WannaCry 为每个文件生成唯一的 AES 密钥，在`encryption_start_entry`的内存分配后执行）；
 
-![image-20260116142639223](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241333.png)
+![image-20260116142639223](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222218285.png)
 
 ❷ 用 AES 密钥加密文件内容；
 
@@ -180,7 +180,7 @@ WannaCry 使用了 **AES + RSA** 的混合加密方式，这也是现代勒索�
 
 ❹ 存储加密后的 AES 密钥。
 
-![image-20260116165202509](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241334.png)
+![image-20260116165202509](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222216052.png)
 
 ### 3. 多线程并发
 
@@ -189,15 +189,15 @@ WannaCry 使用了 **AES + RSA** 的混合加密方式，这也是现代勒索�
 - **小文件**：全量加密。
 - **大文件**：采用部分加密策略。在保证文件结构被破坏（无法打开）的同时，极大地缩短了磁盘 I/O 时间，提高了攻击效率，减少了被行为防护软件拦截的窗口期。
 
-![image-20260116182003903](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241335.png)
+![image-20260116182003903](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222213439.png)
 
 标准化.WNCRY后缀 + 触发加密/删除逻辑
 
-![image-20260116193225655](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241336.png)
+![image-20260116193225655](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222211150.png)
 
 执行差异化加密的函数
 
-![image-20260116195124740](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241337.png)、
+![image-20260116195124740](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222208478.png)、
 
 ## 第四阶段：胁迫与持久化
 
@@ -209,19 +209,19 @@ WannaCry 使用了 **AES + RSA** 的混合加密方式，这也是现代勒索�
 
 ##### 设置勒索壁纸
 
-![image-20260116195844986](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241338.png)
+![image-20260116195844986](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222206007.png)
 
 ##### 弹出`@WanaDecryptor@.exe` 窗口
 
 运行 `@WanaDecryptor@.exe` (即 `u.wnry`)。这是一个封装完善的GUI程序，它不仅显示倒计时，还提供了“解密演示”功能，通过解密几个小文件来诱导用户相信支付赎金真的有效。
 
-![image-20260116200629330](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241339.png)
+![image-20260116200629330](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222202937.png)
 
 ### 2.持久化驻留
 
 ##### 设置开机启动项
 
-![image-20240919150840858](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232151480.png)
+![image-20240919150840858](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222159016.png)
 
 ## 第五阶段：扫尾与反取证
 
@@ -233,7 +233,7 @@ WannaCry 使用了 **AES + RSA** 的混合加密方式，这也是现代勒索�
 2. **清空回收站**：确保用户无法找回被删除的原始文件。
 3. 在很多变种中，还会调用 `vssadmin` 删除系统的**卷影副本（Shadow Copies）**，彻底断绝Windows自带的系统还原之路。
 
-![image-20260116201446813](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162241340.png)
+![image-20260116201446813](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222154186.png)
 
 ## 总结
 

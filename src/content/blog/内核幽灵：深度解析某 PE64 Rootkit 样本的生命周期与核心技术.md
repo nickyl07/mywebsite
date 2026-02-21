@@ -94,31 +94,31 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 
 ##### 建病毒设备对象
 
-![image-20260117160847402](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239999.png)
+![image-20260117160847402](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222357147.png)
 
 ###### CreateMalDeviceObject
 
-##### ![image-20260117160910406](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239000.png)
+##### ![image-20260117160910406](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222415849.png)
 
 ###### ResetDeviceAndHijackIRPCreate
 
-![image-20260117162826514](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239001.png)
+![image-20260117162826514](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222426896.png)
 
 #### **B. 隐身与注入准备 (`CredentialTheft_EntryPoint`)**
 
 - **功能**：这一步通常包含 **SSDT Hook**（修改系统服务表）和 **进程挂靠准备**（针对 `lsass.exe`）。
 - **目的**：为后续的凭据窃取和隐藏自身打下基础。
 
-![image-20260117220434601](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239002.png)
+![image-20260117220434601](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222432900.png)
 
 #### **C. 核心网络劫持 (`ObReferenceObjectByName_AFD`)**
 
 - **技术深度**：这是该样本最核心的技术之一。它没有选择传统的应用层注入来劫持浏览器，而是直接在内核层 Hook 了 **AFD (Ancillary Function Driver for WinSock)**。
 - **后果**：AFD 是 Windows Socket 通信的底层驱动。控制了它，就等于控制了所有通过 Winsock 发起的网络请求（包括浏览器访问网页）。这就是为什么它能精准地进行 HTTP 重定向。
 
-![image-20260117223716530](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239003.png)
+![image-20260117223716530](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222435188.png)
 
-![image-20260117223759705](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239004.png)
+![image-20260117223759705](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222438047.png)
 
 ## 第二阶段：穿上隐身衣 (隐匿对抗阶段)
 
@@ -141,7 +141,7 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 
 > 此时，操作系统已经“撒谎”了。当你打开任务管理器或使用普通工具查看系统状态时，你看到的只是病毒想让你看到的样子。
 
-![image-20260117220700100](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239005.png)
+![image-20260117220700100](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222443342.png)
 
 ## 第三阶段：伸出触手 (注入与穿透阶段)
 
@@ -156,13 +156,13 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 - **技术动作**: 使用 `KeStackAttachProcess`。
 - **行为分析**: 这是一个强大的内核 API，允许驱动程序临时“附身”到目标进程的内存空间中。一旦附身成功，病毒就可以以 `smss.exe` 的名义执行操作。
 
-![image-20260117220943257](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239006.png)
+![image-20260117220943257](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222447190.png)
 
 ### 2.执行用户层 API
 
 在挂靠状态下，病毒通过 APC (异步过程调用) 或直接寻找函数地址的方式，调用用户层的 `WinExec` 等函数。这实现了从 Ring 0 到 Ring 3 的反向控制，让合法的系统进程替它干坏事。
 
-![image-20260117221048460](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239007.png)
+![image-20260117221048460](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222451482.png)
 
 ## 第四阶段：捕猎与收割 (负载执行阶段)
 
@@ -184,7 +184,7 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 
 一旦发现这些浏览器启动，病毒就会立即激活劫持逻辑。
 
-![image-20260117221712129](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239008.png)
+![image-20260117221712129](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222455314.png)
 
 ### 2.流量绑架：Minifilter 驱动
 
@@ -194,7 +194,7 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 
 - **后果**: 用户打开浏览器时，会被强制重定向到 `hao123.com`（带推广ID）或其他恶意广告页。
 
-  ![image-20260117221847518](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239009.png)
+  ![image-20260117221847518](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222458535.png)
 
 ### 3.终极对抗：拔掉卫士的牙齿
 
@@ -204,7 +204,7 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 
 - **目的**: 试图禁用 360 的主动防御模块，使其失效。
 
-  ![image-20260117221945596](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239010.png)
+  ![image-20260117221945596](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222500814.png)
 
 ### 4.下载器
 
@@ -214,7 +214,7 @@ NTSTATUS __stdcall DriverEntry(_DRIVER_OBJECT *DriverObject, PUNICODE_STRING Reg
 - 下载最新的盗号木马或勒索软件。
 - 将文件释放在 `C:\WINDOWS\TEMP\` 下，并用随机文件名伪装运行。
 
-![image-20260117222135282](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162239011.png)
+![image-20260117222135282](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222546737.png)
 
 ## 总结
 

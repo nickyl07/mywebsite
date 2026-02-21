@@ -39,11 +39,11 @@ search: true
 
 安装并运行 `3CXDesktopApp.exe` 后，程序会自动加载目录下的 `ffmpeg.dll`。这本是一个用于音视频处理的开源库，但攻击者对其进行了恶意修改。
 
-![image-20240304104113994](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243730.png)
+![image-20240304104113994](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221607493.png)
 
 **单实例互斥机制：** 在 `DllMain` 或初始化函数中，恶意代码首先创建一个名为 `AVMonitorRefreshEvent` 的事件对象。如果创建失败，说明程序已在运行，随即退出。这是恶意软件常见的防多开与反沙箱对抗手段。
 
-![image-20240317213412769](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243731.png)
+![image-20240317213412769](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221612554.png)
 
 *ffmpeg.dll 创建事件以保证单实例运行*
 
@@ -53,59 +53,59 @@ search: true
 
 **[CVE-2013-3900 签名验证漏洞利用](https://msrc.microsoft.com/update-guide/vulnerability/CVE-2013-3900)：** 查看 `d3dcompiler_47.dll` 的属性，发现其拥有有效的微软数字签名。然而，攻击者利用了 WinVerifyTrust 的一个已知机制（CVE-2013-3900）：在经过签名的PE文件尾部追加数据，不会破坏签名的有效性。
 
-![image-20240304105015276](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243732.png)
+![image-20240304105015276](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221610434.png)
 
 *文件具备有效的微软数字签名*
 
-![image-20240317214032067](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243733.png)
+![image-20240317214032067](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221617554.png)
 
-![image-20240304105434737](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243734.png)
+![image-20240304105434737](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221619666.png)
 
 在十六进制编辑器中查看文件末尾，可以清晰地看到在正常的PE数据之后，附加了大量看似杂乱的数据。
 
 **Shellcode 定位与解密：** 通过逆向分析 Loader 代码，发现其会在内存中搜索特征码 `0xFE 0xED 0xFA 0xCE`（Feed Face），以此作为加密数据的起始标记。
 
-![image-20240317214210988](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243735.png)
+![image-20240317214210988](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221624739.png)
 
-![image-20240315182920144](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243736.png)
+![image-20240315182920144](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221622066.png)
 
 找到数据块后，Loader 使用 **RC4算法** 进行解密。解密后的数据是一段可执行的 Shellcode。
 
-![image-20240317220536940](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243737.png)
+![image-20240317220536940](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221627957.png)
 
 **执行流程转移：** 解密完成后，代码调用 `VirtualProtect` 将该内存区域属性修改为 `PAGE_EXECUTE_READWRITE` (RWX)，随后通过 `call` 指令跳转执行，正式进入第三阶段。
 
-![image-20240317221345962](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243738.png)
+![image-20240317221345962](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221629708.png)
 
 ### 第三阶段：潜伏与C2通信 (Icon隐写术)
 
 Shellcode 运行后，首先展现出了持久化与潜伏特性。它会读取配置文件（Manifest），检查时间戳。如果未达到预设时间，它会写入当前时间并休眠 **7天**，这种设计极大地增加了沙箱检测的难度。
 
-![image-20240320152803816](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243739.png)
+![image-20240320152803816](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221633156.png)
 
 **GitHub 图标隐写 (Steganography)：** 这是该样本最显著的特征。恶意代码并不直接连接硬编码的C2 IP，而是访问 GitHub 上的一个仓库： URL结构：`https://raw.githubusercontent.com/IconStorages/images/main/icon%d.ico`
 
-![image-20240320163245194](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243740.png)
+![image-20240320163245194](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221636356.png)
 
-![image](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243741.jpeg)
+![image](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221638080.jpeg)
 
 表面上看这是普通的图标文件，但分析下载的 `.ico` 文件，发现其文件尾部被附加了 Base64 编码的字符串。
 
-![image-20240325182353056](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243742.png)
+![image-20240325182353056](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221640023.png)
 
 **C2 解析流程：**
 
 **识别特征**：寻找以 `$` 符号开头的 Base64 数据段。
 
-![image-20240325182617974](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243743.png)
+![image-20240325182617974](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221641418.png)
 
 **解密算法**：使用 **AES-GCM** 算法对 Base64 解码后的数据进行解密。
 
-![image-20240325183011132](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243744.png)
+![image-20240325183011132](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221643926.png)
 
 **获取C2**：解密结果即为真实的命令控制服务器（C2）地址。
 
-![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243745.jpg)
+![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221645378.jpeg)
 
 最终解密出的C2地址如下所示，Shellcode 将连接此地址下载最终的窃密组件。
 
@@ -120,15 +120,15 @@ Shellcode 运行后，首先展现出了持久化与潜伏特性。它会读取�
 - Brave
 - Mozilla Firefox
 
-![image-20240401144824765](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243747.png)
+![image-20240401144824765](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221648803.png)
 
 **窃取内容：** 恶意代码会遍历用户数据目录，重点寻找 `History` (Chromium系) 和 `places.sqlite` (Firefox) 数据库文件。
 
-![image-20240401145118924](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243748.png)
+![image-20240401145118924](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221650202.png)
 
 通过SQL查询语句，它会提取最近的浏览记录（样本中限制为500条），这些信息可能包含内网入口、云服务凭证等高价值情报，符合APT攻击的侦察特征。
 
-![image-20240401143013981](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232243749.png)
+![image-20240401143013981](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221652234.png)
 
 ## 结论
 

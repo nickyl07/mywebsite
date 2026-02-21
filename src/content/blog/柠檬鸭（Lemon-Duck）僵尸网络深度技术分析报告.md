@@ -37,7 +37,7 @@ search: true
 
 识别IEX：如果你不知道这行具体做什么，就用PowerShel运行，就像下面一样。下图显示，实际上是Invoke-Expression cmdlet。*.( $veRbosePrEfERENCe.TOStrIng()[1,3]+'X'-joIn'')*
 
-![6](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236808.png)
+![6](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222602028.png)
 
 参考：[简单的解混之法](https://fareedfauzi.github.io/2021/02/06/LemonDuck-Powershell.html#final-result)
 
@@ -280,9 +280,9 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 - 核心函数：`smb1_anonymous_connect_ipc`（匿名连接目标主机 IPC$ 共享）、`eb7/eb8`（构造恶意 SMB 数据包触发缓冲区溢出）；
 
-![image-20260213184921229](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236809.png)
+![image-20260213184921229](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222610405.png)
 
-![image-20260214000205631](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236810.png)
+![image-20260214000205631](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222612123.png)
 
 - 攻击逻辑：
   1. 向目标主机 445 端口发送恶意 SMB 数据包；
@@ -297,15 +297,15 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 - 支持 NLA 模式适配（`/sec:nla`参数），通过`/cert-ignore`绕过证书验证，实现 NLA 绕过；
 
-![image-20260214000839851](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236811.png)
+![image-20260214000839851](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222614938.png)
 
 - 低频率探测策略（10 秒超时 + 1 秒循环检测），规避日志告警；
 
-![image-20260214000902366](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236812.png)
+![image-20260214000902366](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222617122.png)
 
 - 解析 RDP 客户端输出（如`LogonInfoV2`标识登录成功、`Server rdp encryption method`标识服务存活），判断攻击结果。
 
-![image-20260214000943093](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236813.png)
+![image-20260214000943093](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222619040.png)
 
 ###### Redis 漏洞
 
@@ -313,7 +313,7 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 - 核心函数：`redisexec`（利用 Redis 漏洞实现 Linux 端渗透）、`Enable-SeDebugPrivilege`（启用高权限调试权限）、`LHSDGUKsdHF`（反射加载 PE 文件，提权工具）；
 
-![image-20260214001057178](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236814.png)
+![image-20260214001057178](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222621163.png)
 
 ##### 三、核心能力
 
@@ -362,11 +362,11 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 **强制终止主流挖矿进程**：预设`$Miner`进程列表，包含近 60 个挖矿程序相关特征名，覆盖**门罗币挖矿（XMR\*、xmrig\*、minerd）**、挖矿代理（MinerGate）、其他币种挖矿（Carbon）等主流挖矿程序，同时包含挖矿程序常见的伪装进程名（svchosti、explores、conhoste 等，仿冒系统进程），通过`Stop-Process -Force`强制终止，无任何容错空间。
 
-![image-20260213220121118](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236815.png)
+![image-20260213220121118](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222625674.png)
 
 **深度暂停挖矿代理关联进程**：对检测到的挖矿代理外网连接关联进程，通过`ProcessSuspend`函数调用`kernel32.dll`底层 API 实现**进程调试暂停**，该方式比原生终止更彻底，且需要`SeDebugPrivilege`高级权限才能解除，能有效防止其他挖矿程序的进程自重启，从进程运行层面实现算力独占。
 
-![image-20260213220702841](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236816.png)
+![image-20260213220702841](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222627473.png)
 
 ###### 持久化层面：删除竞品自启动项，杜绝挖矿程序重启
 
@@ -374,11 +374,11 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 **禁用并删除挖矿相关服务**：预设`$SrvName`恶意服务列表，包含柠檬鸭识别的其他挖矿程序创建的伪装服务（如 xWinWpdSrv、SVSHost、WinHelp32/64）、挖矿程序的持久化服务（如 sysmgt、WebServers），通过`sc.exe`执行**禁用→停止→删除**三步操作，彻底清除挖矿服务自启动项。
 
-![image-20260213221001585](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236817.png)
+![image-20260213221001585](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222629779.png)
 
 **强制删除挖矿相关计划任务**：预设`$TaskName`计划任务列表，包含其他挖矿程序的定时启动任务（如 my1、Mysa 系列、gm/ngm）、挖矿程序伪装的系统任务（如 Windows_Update、Update_windows），通过`SchTasks.exe /Delete /F`强制删除，无提示且不可恢复，切断挖矿程序的定时持久化路径。
 
-![image-20260213221114296](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236818.png)
+![image-20260213221114296](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222631335.png)
 
 ###### 网络层面：阻断竞品挖矿代理连接
 
@@ -386,15 +386,15 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 **精准检测挖矿代理连接**：通过`isminerproxy`/`isminerproxys`函数，针对 XMRig 等主流挖矿程序的**JSONRPC 协议特征**，检测目标主机与外网的挖矿代理连接，覆盖**明文 + TLS 加密**两种挖矿代理通信方式，无死角识别竞品的挖矿网络连接。
 
-![image-20260213221406300](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236819.png)
+![image-20260213221406300](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222633167.png)
 
 **永久封禁挖矿代理 IP**：对检测到的挖矿代理 IP，通过`banIp`函数执行`route add $ip 0.0.0.0 IF 1 -p`添加**永久静态路由**，将挖矿代理 IP 指向空地址，实现本地网络层面的永久阻断，且该路由规则默认对所有网络连接生效，其他挖矿程序无法绕开。
 
-![image-20260213221453774](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236820.png)
+![image-20260213221453774](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222635339.png)
 
 **缓存已处置 IP，避免重复操作**：通过全局变量`$ipdealcache`缓存已封禁的挖矿代理 IP: 端口，后续循环检测中直接执行进程暂停 + IP 封禁，提升清理效率，确保挖矿代理连接被持续阻断。
 
-![image-20260213221601019](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236821.png)
+![image-20260213221601019](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222637070.png)
 
 ##### 二、防御削弱
 
@@ -427,7 +427,7 @@ SMB 是 `if.bin` 横向渗透的核心载体，整合了 SMBv1/SMBv2 协议多�
 
 **后台启动任务管理器，干扰进程查看**：脚本在`Killer`函数中检测任务管理器（TaskMgr）是否运行，若未运行则通过`Start-Process -WindowStyle hidden`**后台启动**，管理员手动打开任务管理器时会出现界面异常，无法正常查看主机的进程列表，也就无法发现柠檬鸭的挖矿进程。
 
-![image-20260213222306764](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162236822.png)
+![image-20260213222306764](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221222640991.png)
 
 **清理系统管理工具相关进程**：`$Miner`进程列表中包含`taskmgr1`（伪装 / 异常的任务管理器进程）、`msinfo`（系统信息工具进程），强制终止此类进程，让管理员无法通过系统原生工具查看主机的进程、资源、网络等关键信息，无法手动定位并清理柠檬鸭的挖矿组件。
 

@@ -54,17 +54,17 @@ Microsoft Word中对宏定义为：
 
 现在通常文档中的宏是被默认禁用的，选择“启用内容”后，宏才会执行。
 
-![image-20240728185305988](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144953.png)
+![image-20240728185305988](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221742658.png)
 
 查看宏代码：
 
 在选项中勾选开发工具
 
-![image-20240728185456720](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144954.png)
+![image-20240728185456720](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221746463.png)
 
 选择Visual Basic，即可打开VB编辑器，查看宏代码。或者使用快捷键“Alt+F11”打开。
 
-![image-20240728185522358](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144955.png)
+![image-20240728185522358](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221748502.png)
 
 执行恶意功能的宏就是宏病毒，使用VBA编写。宏病毒只在Microsoft Office办公软件创建的电子文档中感染。
 
@@ -80,15 +80,15 @@ File:demo2.doc
 
 sha1:9abeef3ed793f28a24562c3e5c3104eee99daa1c
 
-![image-20240728234520091](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144958.png)
+![image-20240728234520091](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221751071.png)
 
 查看VBA，宏被加密了，提示需要密码
 
-![image-20240728234740973](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144959.png)
+![image-20240728234740973](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221754539.png)
 
 ##### 使用工具VBA Password Bypasser解密
 
-![202407291829125](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144960.png)
+![202407291829125](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221757020.png)
 
 ##### 使用oledump分析流
 
@@ -96,7 +96,7 @@ oledump.py  demo2.doc
 
 [^]: 用python2跑
 
-![202407291828146](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144961.png)
+![202407291828146](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221758571.png)
 
 列出此文件的Stream数据，标记字母‘M’的一行，表示这段数据中存在宏。
 
@@ -106,7 +106,7 @@ oledump.py -v：解压缩VBA宏
 
 两个参数结合：oledump.py -s A3 -v demo2.doc
 
-![202407291831475](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144962.png)
+![202407291831475](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221801265.png)
 
 参数选择‘a’，表示分析所有段的数据，使用‘>’，宏代码数据将存储在新文件中
 
@@ -124,18 +124,18 @@ File:bab93bc258ed673a849e8a8a6da080cf82e3dab3fdb29f6ae42031280cda49ef
 
 md5:71c7d149cec1d8a3a7e54711b3b64383
 
-![202408051833344](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144963.png)
+![202408051833344](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221803840.png)
 
 ##### 使用动态调试的方法
 
 点击视图开启立即窗口、本地窗口和监视窗口
-![image-20240806010204071](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144964.png)
+![image-20240806010204071](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221807085.png)
 Set nZsXAIAmrwsMOxkvh = gxUVYeacLIkNroPKoYAd.CreateTextFile(oCHIUZS, True, True)，创建文件，通过设置断点，通过观察本地窗口变量的值可知创建了文件"C:\Users\Adif\Downloads\deer.ini"
-![image-20240806010556053](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144965.png)
+![image-20240806010556053](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221809425.png)
 接着是大量的字符串拼接，后面应该会进行解密写文件操作
-![image-20240806010637075](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144966.png)
+![image-20240806010637075](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221812798.png)
 UNMfYyPswUtPDcyphmZwEXyU先对字符串进行了base64的解密，再写入到了“C:\Users\Adif\Downloads\deer.ini”文件中
-![image-20240806232428643](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144967.png)
+![image-20240806232428643](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221815569.png)
 执行生成的vba脚本
 
 ```
@@ -144,7 +144,7 @@ CallByName VWjEFsxZ, "ShellExecute", VbMethod, "wscript.exe", "C:\Users\Adif\Dow
 ```
 
 最后写注册表，实现自启
-![image-20240806011024885](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144968.png)
+![image-20240806011024885](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221818907.png)
 **deer.ini分析**
 新建一个word，启动visualBasic编辑器，并将beer.ini的内容复制进去。同样使用动态调试来分析。
 创建"C:\Users\Adif\deer.exe"，写注册表
@@ -160,7 +160,7 @@ HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Word\Security\AccessVBOM为1 HK
 ```
 
 可以使用debug.print调试输出url，得到一个url
-![图片描述](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144969.png)
+![图片描述](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221821943.png)
 
 # 技术篇
 
@@ -188,7 +188,7 @@ File: APT28.DOCX
 
 文档被设计为通过内嵌在DOCX文档中的settings.xml.rels组件来从hxxp://109.248.148.42/office/thememl/2012/main/attachedTemplate.dotm加载恶意启用宏的内容
 
-![202408011404136](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144970.png)
+![202408011404136](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221825337.png)
 
 参考：[APT28新动向：利用英国脱欧主题钓鱼邮件传播Zekapab恶意软件 ](https://www.secrss.com/articles/7061)
 
@@ -202,7 +202,7 @@ NTLM Hashes通常是指Windows系统下Security Account Manager中保存的用�
 
 恶意构造的docx打开时会访问远程资源，访问远程资源使用NTLM协议进行身份验证，从而泄露NTLM Hashes信息。
 
-![webSettings XML Relationship File - Contents](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144971.png)
+![webSettings XML Relationship File - Contents](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221828315.png)
 
 参考：[pentestlab](https://pentestlab.blog/2017/12/18/microsoft-office-ntlm-hashes-via-frameset/)
 
@@ -216,13 +216,13 @@ VBA在Office文档中可以以下面三种形似存在
 
 3、ExeCodes。当P-Code执行一次之后，其会被一种标记化的形式存储在__SRP__流中，之后再次运行时会提高VBA的执行速度，可以将其删除，并不影响宏的执行。
 
-![image-20240805233544057](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144972.png)
+![image-20240805233544057](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221830809.png)
 
 “Attribut”的地方是源代码
 
-![image-20240806000238585](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144973.png)
+![image-20240806000238585](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221833307.png)
 
-![image-20240806000546594](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144974.png)
+![image-20240806000546594](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221835816.png)
 
 每一个流模块中都会存在一个未被文档化的PerformanceCache，其中包含了被编译后的P-Code代码，如果_VBA_PROJECT流中指定的Office版本与打开的Office版本相同，则会忽略流模块中的源代码，去执行P-Code代码。
 
@@ -361,7 +361,7 @@ Public Declare Function clothed Lib "user32" Alias "GetUpdateRect" (prestigiatio
 
 这种方式和利用窗体属性的方式类似，就是将一切能存储数据的地方利用起来。就像Demo3中读取文件详细信息中的备注
 
-![202407301833032](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144975.png)
+![202407301833032](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221841918.png)
 
 #### 恶意行为字符串
 
@@ -396,21 +396,21 @@ Public Declare Function clothed Lib "user32" Alias "GetUpdateRect" (prestigiatio
 
 ### 宏VBA密码工程文件密码破解
 
-![image-20250223133832872](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144976.png)
+![image-20250223133832872](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221845267.png)
 
 使用 WinHex软件二进制编辑器打开vbaProject.bin，搜索【DPB】,将【DPB】改为【DPX】并保存。
 
-![image-20250223133858937](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144977.png)
+![image-20250223133858937](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221847036.png)
 
 将修改后的vbaProject.bin替换掉原来的文件,文件重新改回到原来的格式。
 
 打开文件，忽略错误，就可以查看VBA代码了，为了防止报错可以重新添加密码。
 
-![image-20250223133958091](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144978.png)
+![image-20250223133958091](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221849093.png)
 
 【开发工具】-->【Visual Basic】-->【工具】-->【VBA Project属性】-->【保护】重新设置密码
 
-![image-20250223134050855](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202502232144979.png)
+![image-20250223134050855](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221851017.png)
 
 保存文件，关闭后重新打开，输入设置的密码，即可
 

