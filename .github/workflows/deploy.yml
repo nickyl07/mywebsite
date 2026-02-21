@@ -1,0 +1,30 @@
+name: Deploy Astro to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]  # 监听 main 分支的推送
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20  # 用兼容 Astro 的 Node 版本
+          cache: 'pnpm'     # 适配你的 pnpm 包管理器
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Astro site
+        run: pnpm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist  # Astro 构建输出目录
