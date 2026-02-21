@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://astro-antfustyle-theme.vercel.app/sitemap-index.xml
