@@ -11,8 +11,8 @@ import { SITE } from './src/config'
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
-  site: SITE.website,
-  base: SITE.base,
+  site: 'https://nickyl07.github.io',
+  base: '/mywebsite',
   integrations: [
     sitemap(),
     robotsTxt(),
