@@ -162,7 +162,7 @@ export const FEATURES: Features = {
   giscus: [
     true,
     {
-      'data-repo': 'lin-stephanie/astro-antfustyle-theme',
+      'data-repo': 'nickyl07/nicky.cool',
       'data-repo-id': 'R_kgDOLylKbA',
       'data-category': 'Giscus',
       'data-category-id': 'DIC_kwDOLylKbM4Cpugn',
@@ -171,7 +171,7 @@ export const FEATURES: Features = {
       'data-reactions-enabled': '1',
       'data-emit-metadata': '0',
       'data-input-position': 'bottom',
-      'data-lang': 'zh',
+      'data-lang': 'zh-CN',
     },
   ],
   search: [
