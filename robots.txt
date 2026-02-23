@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://nickyl07.github.io/mywebsite/sitemap-index.xml
+Sitemap: https://nickyl07.github.io/nicky.cool/sitemap-index.xml
