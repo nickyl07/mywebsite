@@ -12,7 +12,7 @@ import { SITE } from './src/config'
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
   site: 'https://nickyl07.github.io',
-  base: '/mywebsite',
+  base: '/nicky.cool',
   integrations: [
     sitemap(),
     robotsTxt(),
